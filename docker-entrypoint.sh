@@ -3,7 +3,7 @@ set -e
 
 # Set timezone if variable is set
 if [ ! -z "${TZ}" ]; then
-    echo "Setting timezone to ${TZ}"
+    echo "ℹ️ Setting timezone to ${TZ}"
     ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime
     echo "${TZ}" > /etc/timezone
 fi
@@ -87,7 +87,7 @@ done
 #  If PG_PASSWORD_SECRET is not defined, use PASSWORD env variable
 PASSPHRASE=""
 if [ "${PG_PASSWORD_SECRET}" ]; then
-    echo "Using docker secrets..."
+    echo "ℹ️ Using docker secrets..."
     if [ -f "/run/secrets/${PG_PASSWORD_SECRET}" ]; then
         PASSPHRASE=$(cat /run/secrets/${PG_PASSWORD_SECRET})
     else
@@ -96,19 +96,19 @@ if [ "${PG_PASSWORD_SECRET}" ]; then
         exit 1
     fi
 else
-    echo "Using environment password..."
+    echo "ℹ️ Using environment password..."
     PASSPHRASE=${PG_PASSWORD}
 fi
 
 # Determine selected DB engine (from PG_DBENGINE or default)
 DBENGINE="${PG_DBENGINE:-${DEFAULTS[DBENGINE]}}"
-echo "Selected database engine: ${DBENGINE}"
+echo "ℹ️ Selected database engine: ${DBENGINE}"
 if [[ "${DBENGINE}" != "postgresql" && "${DBENGINE}" != "mysql" ]]; then
   echo "❌ ERROR: Unsupported DBENGINE '${DBENGINE}'. Must be 'postgresql' or 'mysql'."
   exit 1
 fi
 
-echo "Running environment sanity check..."
+echo "🔍 Running environment sanity check..."
 
 # Check required variables
 missing=()
@@ -149,10 +149,10 @@ echo "✅ Sanity check passed."
 # Logic for the CRON schedule
 #  If CRON_SCHEDULE is defined, use this value, otherwise use a default
 if [ "${CRON_SCHEDULE}" ]; then
-    echo "Configuring schedule in /etc/crontab for ${CRON_SCHEDULE}..."
+    echo "ℹ️ Configuring schedule in /etc/crontab for ${CRON_SCHEDULE}..."
 else
     CRON_SCHEDULE="0 2 * * *"
-    echo "Configuring schedule in /etc/crontab for default crontab running daily at 02:00..."
+    echo "ℹ️ Configuring schedule in /etc/crontab for default crontab running daily at 02:00..."
 fi
   
 # Create the crontab file
@@ -192,8 +192,9 @@ fi
 
 echo "✅ Config written to $CONFIG_PATH"
 echo " "
-echo "Current Config :"
-cat $CONFIG_PATH
+echo "ℹ️ Current Config :"
+#using nl instead of cat to workaround a wierd issue where the EXT="sql" line would not show properly with cat
+nl -bn $CONFIG_PATH
 
 echo " "
 echo "✅ Done setting up..."
@@ -206,13 +207,13 @@ if [ "$1" = "backup-now" ]; then
   echo "Manual backup triggered..."
   exec /opt/autopostgresqlbackup/autopostgresqlbackup
 elif [ "$1" = "show-config" ]; then
-  echo "Only showing config, not starting cron/backup..."
+  echo "ℹ️ Only showing config, not starting cron/backup..."
   exit 0
 elif [ "$1" = "test-connection" ]; then
   echo "Testing database connection for engine: ${DBENGINE}"
 
   if [ "${DBENGINE}" = "postgresql" ]; then
-    echo "Attempting PostgreSQL connection to host '${PG_DBHOST}' as user '${PG_USERNAME}'..."
+    echo "ℹ️ Attempting PostgreSQL connection to host '${PG_DBHOST}' as user '${PG_USERNAME}'..."
     psql -h "${PG_DBHOST}" -U "${PG_USERNAME}" -d postgres -c '\q' >/dev/null 2>&1
     if [ $? -eq 0 ]; then
       echo "✅ PostgreSQL connection successful."
@@ -222,7 +223,7 @@ elif [ "$1" = "test-connection" ]; then
     fi
 
   elif [ "${DBENGINE}" = "mysql" ]; then
-    echo "Attempting MySQL connection to host '${PG_DBHOST}' as user '${PG_USERNAME}'..."
+    echo "ℹ️ Attempting MySQL connection to host '${PG_DBHOST}' as user '${PG_USERNAME}'..."
     mysql --host="${PG_DBHOST}" -e "SELECT 1;" >/dev/null 2>&1
     if [ $? -eq 0 ]; then
       echo "✅ MySQL connection successful."
@@ -234,9 +235,9 @@ elif [ "$1" = "test-connection" ]; then
 
   exit 0
 elif [ -n "$1" ]; then
-  echo "WARNING: Unknown argument '$1' — ignoring and starting cron."
+  echo "⚠️ Unknown argument '$1' — ignoring and starting cron."
 fi
 
-echo "Starting cron service..."
+echo "ℹ️ Starting cron service..."
 exec cron -f
 

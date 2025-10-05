@@ -37,14 +37,15 @@ FROM debian:bullseye-slim
 RUN apt-get update \
 && apt-get install -y --no-install-recommends \
     bash \
-    gnupg \
     gzip \
     openssl \
     tzdata \
-    passwd \
     cron \
-    default-mysql-client \
-&& rm -rf /var/lib/apt/lists/*
+    libreadline8 \
+    libldap-2.4-2 \
+    mariadb-client-10.5 \
+&& rm -rf /var/lib/apt/lists/* \
+&& rm -rf /usr/share/man/* /usr/share/doc/* /usr/share/info/* /usr/share/lintian/* /usr/share/locale/*
 
 # Create folders
 RUN mkdir -p /etc/autodbbackup.d \
@@ -69,5 +70,5 @@ RUN ln -s /usr/share/postgresql-common/pg_wrapper /usr/bin/pg_dump \
 COPY --chmod=755 docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-HEALTHCHECK --interval=60s --timeout=10s --start-period=20s --retries=3 \
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
   CMD pidof cron || (echo "cron not running" && exit 1)
