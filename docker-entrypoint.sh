@@ -188,6 +188,7 @@ if [ "${DBENGINE}" = "mysql" ]; then
 user=${PG_USERNAME}
 password=${PASSPHRASE}
 host=${PG_DBHOST}
+ssl-verify-server-cert=off
 EOF
   chmod 0600 /root/.my.cnf
 fi
