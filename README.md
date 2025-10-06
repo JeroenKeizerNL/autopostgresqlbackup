@@ -1,6 +1,6 @@
 ## General information
 This docker container uses the latest autopostgresqlbackup package from the [k0lter/autopostgresqlbackup](https://github.com/k0lter/autopostgresqlbackup) repo.
-The image is based on debian bullseye and has Postgresql 17 client and mariadb 10.5 client installed.\
+The image is based on debian trixie and has Postgresql 17.6 client and mariadb 11.8 client installed.\
 most of the configuration can be edited using docker enviroment variables (PG_*)
 
 ## Installation
