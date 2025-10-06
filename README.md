@@ -92,7 +92,25 @@ At a minimum the settings PG_DBENGINE, PG_USERNAME, PG_PASSWORD (or PG_PASSWORD_
       -v /my/backup/dir:/backup
       jeroenkeizernl/autopostgresqlbackup:latest backup-now
 
-### With docker-compose
+### With docker-compose and password
+
+    version: '3.5'
+
+    services:
+      autopostgresqlbackup:
+        image: jeroenkeizernl/autopostgresqlbackup:latest
+        container_name: autopostgresqlbackup
+        environment:
+          - PG_DBENGINE = postgresql
+          - PG_DBHOST = myserver
+          - PG_USERNAME = postgres
+          - PG_PASSWORD = mypassword
+          - TZ = "Europe/Amsterdam"
+        volumes:
+        - /my/backups/dir:/backup
+        - /etc/localtime:/etc/localtime:ro
+
+### With docker-compose and password-file
 
     version: '3.5'
 
@@ -112,9 +130,9 @@ At a minimum the settings PG_DBENGINE, PG_USERNAME, PG_PASSWORD (or PG_PASSWORD_
         secrets:
         - posgre-pass
 
-      secrets:
-        posgre-pass:
-          file: /path/to/file/that/contains/password
+    secrets:
+      posgre-pass:
+        file: /path/to/file/that/contains/password
 
-
+## Git repo
 https://github.com/JeroenKeizerNL/autopostgresqlbackup
