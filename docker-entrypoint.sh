@@ -55,6 +55,7 @@ declare -A BLACKLIST=(
   [POSTBACKUP]=1
   [DEBUG]=1
   [GPG_HOMEDIR]=1
+  [PASSWORD]=1
 
 )
 
@@ -186,6 +187,7 @@ if [ "${DBENGINE}" = "mysql" ]; then
 [client]
 user=${PG_USERNAME}
 password=${PASSPHRASE}
+host=${PG_DBHOST}
 EOF
   chmod 0600 /root/.my.cnf
 fi
