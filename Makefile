@@ -15,11 +15,11 @@ pull:
 	@echo "📥 Pulling latest source..."
 	git pull
 
-_build: pull clean
+build: pull clean
 	@echo "🐳 Building Docker image..."
 	docker build -t $(IMAGE_NAME):$(TAG) .
 
-test: _build
+test: build
 	@echo "🚀 Running container..."
 	docker run -d --name $(IMAGE_NAME) \
 		-e PG_DBHOST=myserver \
@@ -70,7 +70,7 @@ shell:
 	@echo "🧑‍💻 Opening shell in container..."
 	docker exec -it $(IMAGE_NAME) /bin/bash
 
-unittest: pull clean _build
+unittest: pull clean build
 	@echo "🧪 Starting unit test..."
 
 	# Create structured backup and data folders
